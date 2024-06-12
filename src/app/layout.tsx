@@ -2,6 +2,8 @@ import '@/styles/globals.css'
 
 import { GeistSans } from 'geist/font/sans'
 
+import { ThemeProvider } from '@/components/theme-provider'
+import { cn } from '@/lib/utils'
 import { TRPCReactProvider } from '@/trpc/react'
 
 export const metadata = {
@@ -16,9 +18,21 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" className={`${GeistSans.variable}`}>
-      <body>
-        <TRPCReactProvider>{children}</TRPCReactProvider>
+    <html lang="en" suppressHydrationWarning>
+      <body
+        className={cn(
+          'bg-background flex h-screen flex-col font-sans antialiased',
+          GeistSans.variable
+        )}
+      >
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <TRPCReactProvider>{children}</TRPCReactProvider>
+        </ThemeProvider>
       </body>
     </html>
   )
