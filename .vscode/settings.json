@@ -12,7 +12,6 @@
   },
   "typescript.preferences.autoImportFileExcludePatterns": [
     "@radix-ui/*",
-    "lucide-react",
-    "sonner"
+    "lucide-react"
   ]
 }
