@@ -10,6 +10,7 @@ import {
   varchar,
 } from 'drizzle-orm/mysql-core'
 import { type AdapterAccount } from 'next-auth/adapters'
+import { v4 as uuidv4 } from 'uuid'
 
 /**
  * This is an example of how to use the multi-project schema feature of Drizzle ORM. Use the same
@@ -38,11 +39,12 @@ export const posts = createTable(
   })
 )
 
+export const postsRelations = relations(posts, ({ one }) => ({
+  user: one(users, { fields: [posts.createdById], references: [users.id] }),
+}))
+
 export const users = createTable('user', {
-  id: varchar('id', { length: 255 })
-    .notNull()
-    .primaryKey()
-    .default(sql`UUID()`),
+  id: varchar('id', { length: 255 }).notNull().primaryKey().default(uuidv4()),
   name: varchar('name', { length: 255 }),
   email: varchar('email', { length: 255 }).notNull(),
   emailVerified: timestamp('emailVerified', {

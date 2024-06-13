@@ -11,7 +11,7 @@ import {
   ArrowLeftStartOnRectangleIcon,
   ArrowRightEndOnRectangleIcon,
   UserCircleIcon,
-} from '@heroicons/react/24/outline'
+} from '@heroicons/react/24/solid'
 import Link from 'next/link'
 
 export async function UserMenu() {
@@ -23,7 +23,7 @@ export async function UserMenu() {
         <Button
           variant="icon"
           size="icon"
-          className="rounded-full text-purple-300 hover:bg-purple-600"
+          className="rounded-full text-slate-300 hover:bg-slate-600"
         >
           <UserCircleIcon className="size-8" />
           <span className="sr-only">Open user menu</span>
