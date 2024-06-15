@@ -3,12 +3,15 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { type RouterOutputs } from '@/trpc/react'
 import { AnimatePresence, motion } from 'framer-motion'
+import { useMemo } from 'react'
 
 interface PostProps {
-  posts: RouterOutputs['post']['getAll']
+  data: RouterOutputs['post']['getAll']
 }
 
-export function Posts({ posts }: PostProps) {
+export function Posts({ data }: PostProps) {
+  const posts = useMemo(() => data, [data])
+
   return (
     <ul className="n flex w-full flex-col gap-2">
       <AnimatePresence initial={false}>

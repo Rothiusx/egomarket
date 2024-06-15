@@ -22,9 +22,9 @@ export default async function Home() {
       <h1 className="text-5xl font-extrabold tracking-tight sm:text-[5rem]">
         EgoMarket <span className="text-[hsl(280,100%,70%)]">GDKP</span>
       </h1>
-      <span className="my-4 text-3xl">
+      <span className="my-4 text-3xl font-semibold">
         <FlipWords
-          className="w-[500px] text-center"
+          className="w-[600px] text-center"
           words={[
             'One of the most successful GDKP',
             'Multiple raids weekly',
@@ -111,10 +111,9 @@ async function CrudShowcase() {
       ) : (
         <p>You have no posts yet.</p>
       )}
-      {session && <CreatePost />}
-
+      <CreatePost />
       {allPosts.length > 0 ? (
-        <Posts posts={allPosts} />
+        <Posts data={allPosts} />
       ) : (
         <p>You have no other posts yet.</p>
       )}
