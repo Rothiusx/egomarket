@@ -14,9 +14,8 @@ export function CreatePost() {
   const [name, setName] = useState('')
 
   const createPost = api.post.create.useMutation({
-    onSuccess: (data) => {
+    onSuccess: () => {
       router.refresh()
-      console.log(data)
       setName('')
       toast.success(`Post created!`)
     },

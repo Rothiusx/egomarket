@@ -2,7 +2,6 @@ import '@/styles/globals.css'
 
 import { GeistSans } from 'geist/font/sans'
 
-import { AnimatedLayout } from '@/components/animated-layout'
 import { ThemeProvider } from '@/components/theme-provider'
 import { Toaster } from '@/components/ui/sonner'
 import { cn } from '@/lib/utils'
@@ -28,7 +27,7 @@ export default function RootLayout({
     >
       <body
         className={cn(
-          'bg-background flex min-h-screen flex-col overflow-auto bg-gradient-to-b from-slate-300 to-slate-400 font-sans text-slate-900 antialiased dark:from-slate-950 dark:to-slate-900 dark:text-slate-300',
+          'bg-background flex min-h-screen flex-col bg-gradient-to-b from-slate-300 to-slate-400 font-sans text-slate-900 antialiased dark:from-slate-950 dark:to-slate-900 dark:text-slate-300',
           GeistSans.variable
         )}
       >
@@ -41,10 +40,8 @@ export default function RootLayout({
           <header className="sticky top-0 z-10 p-2">
             <NavBar />
           </header>
-          <main className="flex-grow p-2">
-            <AnimatedLayout>
-              <TRPCReactProvider>{children}</TRPCReactProvider>
-            </AnimatedLayout>
+          <main className="flex flex-grow flex-col p-2">
+            <TRPCReactProvider>{children}</TRPCReactProvider>
           </main>
           <Toaster richColors />
         </ThemeProvider>

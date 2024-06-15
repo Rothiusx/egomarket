@@ -1,9 +1,9 @@
 import { Button, type ButtonProps } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
-import { forwardRef, type ReactNode } from 'react'
+import { forwardRef } from 'react'
 
 interface IconHoverButtonProps extends ButtonProps {
-  icon: ReactNode
+  icon: React.ReactNode
 }
 
 const IconHoverButton = forwardRef<HTMLButtonElement, IconHoverButtonProps>(
@@ -20,7 +20,7 @@ const IconHoverButton = forwardRef<HTMLButtonElement, IconHoverButtonProps>(
         <span className="absolute -end-full transition-all group-hover:end-4">
           {icon}
         </span>
-        <span className="transition-all group-hover:me-4">
+        <span className="flex items-center gap-2 transition-all group-hover:me-4">
           {props.children}
         </span>
       </Button>

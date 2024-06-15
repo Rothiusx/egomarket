@@ -5,6 +5,12 @@
 await import('./src/env.js')
 
 /** @type {import("next").NextConfig} */
-const config = {}
+const config = {
+  images: {
+    domains: [
+      'api.microlink.io', // Microlink Image Preview
+    ],
+  },
+}
 
 export default config
