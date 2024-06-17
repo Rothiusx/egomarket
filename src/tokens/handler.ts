@@ -38,8 +38,11 @@ export async function decryptToken({
   identifier: string
 }) {
   const verificationToken = await db.query.verificationTokens.findFirst({
-    where: (verificationToken, { eq }) =>
-      eq(verificationToken.identifier, identifier),
+    where: (verificationToken, { eq, and, gt }) =>
+      and(
+        eq(verificationToken.identifier, identifier),
+        gt(verificationToken.expires, new Date())
+      ),
   })
 
   if (verificationToken) {
