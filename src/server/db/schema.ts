@@ -3,6 +3,7 @@ import {
   bigint,
   index,
   int,
+  json,
   mysqlTableCreator,
   primaryKey,
   text,
@@ -41,6 +42,32 @@ export const posts = createTable(
 
 export const postsRelations = relations(posts, ({ one }) => ({
   user: one(users, { fields: [posts.createdById], references: [users.id] }),
+}))
+
+export const history = createTable('history', {
+  id: bigint('id', { mode: 'number' }).primaryKey().autoincrement(),
+  uploadedAt: timestamp('uploaded_at').default(sql`CURRENT_TIMESTAMP`),
+  uploadedById: varchar('uploaded_by_id', { length: 255 }).notNull(),
+  report: varchar('report', { length: 255 }),
+  totalPot: bigint('total_pot', { mode: 'number' }).notNull(),
+  auctions: json('auctions').notNull(),
+  createdBy: json('created_by').notNull(),
+  goldLedger: json('gold_ledger').notNull(),
+  sessionId: varchar('session_id', { length: 255 }).notNull(),
+  mailHistory: json('mail_history').notNull(),
+  pot: json('pot').notNull(),
+  createdAt: timestamp('created_at').notNull(),
+  lastAvailableBase: bigint('last_available_base', {
+    mode: 'number',
+  }).notNull(),
+  lockedAt: timestamp('locked_at').notNull(),
+  managementCut: bigint('management_cut', { mode: 'number' }).notNull(),
+  title: varchar('title', { length: 255 }).notNull(),
+  type: varchar('type', { length: 255 }).notNull(),
+})
+
+export const historyRelations = relations(history, ({ one }) => ({
+  user: one(users, { fields: [history.uploadedById], references: [users.id] }),
 }))
 
 export const users = createTable('user', {
@@ -111,10 +138,12 @@ export const sessionsRelations = relations(sessions, ({ one }) => ({
 }))
 
 export const verificationTokens = createTable(
-  'verificationToken',
+  'verification_token',
   {
     identifier: varchar('identifier', { length: 255 }).notNull(),
     token: varchar('token', { length: 255 }).notNull(),
+    iv: varchar('iv', { length: 255 }).notNull(),
+    type: varchar('type', { length: 255 }).notNull(),
     expires: timestamp('expires', { mode: 'date' }).notNull(),
   },
   (vt) => ({

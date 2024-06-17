@@ -27,7 +27,7 @@ export default function RootLayout({
     >
       <body
         className={cn(
-          'bg-background flex min-h-screen flex-col bg-gradient-to-b from-slate-300 to-slate-400 font-sans text-slate-900 antialiased dark:from-slate-950 dark:to-slate-900 dark:text-slate-300',
+          'flex min-h-screen flex-col bg-gradient-to-b from-slate-300 to-slate-400 font-sans text-slate-900 antialiased dark:from-slate-950 dark:to-slate-900 dark:text-slate-300',
           GeistSans.variable
         )}
       >

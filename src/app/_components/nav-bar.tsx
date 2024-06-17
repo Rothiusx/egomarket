@@ -1,7 +1,13 @@
 import { HomeIcon } from '@heroicons/react/24/solid'
 import Link from 'next/link'
+import { NavLinks } from './nav-links'
 import { ThemeToggle } from './theme-toggle'
 import { UserMenu } from './user-menu'
+
+const navLinks = [
+  { href: '/gold', label: 'Need Gold? 💰' },
+  { href: '/history', label: 'Loot History' },
+]
 
 export async function NavBar() {
   return (
@@ -15,6 +21,7 @@ export async function NavBar() {
             <HomeIcon className="size-8" />
           </Link>
         </li>
+        <NavLinks links={navLinks} />
         <li className="ml-auto">
           <ThemeToggle />
         </li>

@@ -19,12 +19,12 @@ export default async function Home() {
 
   return (
     <section className="container flex flex-col items-center justify-center gap-8 px-4 py-16">
-      <h1 className="text-5xl font-extrabold tracking-tight sm:text-[5rem]">
+      <h1 className="text-4xl font-extrabold tracking-tight lg:text-6xl">
         EgoMarket <span className="text-[hsl(280,100%,70%)]">GDKP</span>
       </h1>
-      <span className="my-4 text-3xl font-semibold">
+      <span className="my-4 h-12 text-xl font-semibold lg:text-3xl">
         <FlipWords
-          className="w-[600px] text-center"
+          className="w-[400px] text-center lg:w-[600px]"
           words={[
             'One of the most successful GDKP',
             'Multiple raids weekly',
@@ -91,6 +91,9 @@ export default async function Home() {
           {hello ? hello.greeting : 'Loading tRPC query...'}
         </p>
         {session && <ShowSecret />}
+        <Link href="upload-history" className="rounded-lg bg-slate-600 p-2">
+          Upload GDKP history
+        </Link>
       </div>
       <CrudShowcase />
     </section>
