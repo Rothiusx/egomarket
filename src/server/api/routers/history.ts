@@ -16,7 +16,7 @@ export const historyRouter = createTRPCRouter({
     .input(
       z.object({
         history: historySchema,
-        report: z.string().url(),
+        report: z.literal('').or(z.string().url().optional()),
       })
     )
     .mutation(async ({ ctx, input }) => {

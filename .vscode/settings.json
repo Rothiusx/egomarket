@@ -10,8 +10,5 @@
   "files.associations": {
     "*.css": "tailwindcss"
   },
-  "typescript.preferences.autoImportFileExcludePatterns": [
-    "@radix-ui/*",
-    "lucide-react"
-  ]
+  "typescript.preferences.autoImportFileExcludePatterns": ["@radix-ui/*"]
 }

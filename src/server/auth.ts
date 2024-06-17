@@ -5,12 +5,15 @@ import {
   type NextAuthOptions,
 } from 'next-auth'
 import { type Adapter } from 'next-auth/adapters'
+import BattleNetProvider from 'next-auth/providers/battlenet'
 import DiscordProvider from 'next-auth/providers/discord'
+import GitHubProvider from 'next-auth/providers/github'
 
 import { env } from '@/env'
 import { db } from '@/server/db'
 import {
   accounts,
+  authenticators,
   sessions,
   users,
   verificationTokens,
@@ -57,6 +60,7 @@ export const authOptions: NextAuthOptions = {
     accountsTable: accounts,
     sessionsTable: sessions,
     verificationTokensTable: verificationTokens,
+    authenticatorsTable: authenticators,
   }) as Adapter,
   providers: [
     DiscordProvider({
@@ -72,6 +76,43 @@ export const authOptions: NextAuthOptions = {
      *
      * @see https://next-auth.js.org/providers/github
      */
+    GitHubProvider({
+      clientId: env.GITHUB_CLIENT_ID,
+      clientSecret: env.GITHUB_CLIENT_SECRET,
+    }),
+
+    BattleNetProvider({
+      clientId: env.BATTLENET_CLIENT_ID,
+      clientSecret: env.BATTLENET_CLIENT_SECRET,
+      issuer: env.BATTLENET_ISSUER,
+      authorization: {
+        params: {
+          scope: 'openid wow.profile',
+        },
+      },
+      // userinfo: {
+      //   async request(context) {
+      //     const response = await axios.get(
+      //       'https://oauth.battle.net/userinfo',
+      //       {
+      //         headers: {
+      //           Authorization: `Bearer ${context.tokens.access_token}`,
+      //         },
+      //       }
+      //     )
+      //     console.log('USER INFO', response.data)
+      //     return response.data
+      //   },
+      // },
+      profile(profile: { sub: string; battle_tag: string }) {
+        return {
+          id: profile.sub,
+          name: profile.battle_tag,
+          email: '',
+          image: null,
+        }
+      },
+    }),
   ],
 }
 

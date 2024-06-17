@@ -23,14 +23,16 @@ const historySchemaInput = z.object({
   history: z.string().min(1, {
     message: 'Session cannot be empty!',
   }),
-  report: z
-    .string()
-    .url({
-      message: 'Input must be a valid URL!',
-    })
-    .startsWith('https://classic.warcraftlogs.com/reports/', {
-      message: 'Input must be a valid Warcraft Logs URL of a report!',
-    }),
+  report: z.literal('').or(
+    z
+      .string()
+      .url({
+        message: 'Input must be a valid URL!',
+      })
+      .startsWith('https://classic.warcraftlogs.com/reports/', {
+        message: 'Input must be a valid Warcraft Logs URL of a report!',
+      })
+  ),
 })
 
 export function HistoryUploadForm() {
