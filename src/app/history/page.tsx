@@ -13,7 +13,7 @@ export default async function Page() {
       {session && (
         <Link
           href="/history/upload"
-          className="text-xl underline transition-colors"
+          className="rounded-lg bg-slate-700 px-4 py-2 hover:bg-slate-700/50 transition-colors"
         >
           Upload GDKP history
         </Link>

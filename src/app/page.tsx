@@ -91,9 +91,6 @@ export default async function Home() {
           {hello ? hello.greeting : 'Loading tRPC query...'}
         </p>
         {session && <ShowSecret />}
-        <Link href="upload-history" className="rounded-lg bg-slate-600 p-2">
-          Upload GDKP history
-        </Link>
       </div>
       <CrudShowcase />
     </section>
