@@ -133,6 +133,7 @@ export const verificationTokens = createTable(
     identifier: varchar('identifier', { length: 255 }).notNull(),
     token: varchar('token', { length: 255 }).notNull(),
     iv: varchar('iv', { length: 255 }).notNull(),
+    type: varchar('type', { length: 255 }),
     expires: timestamp('expires', { mode: 'date' }).notNull(),
   },
   (verificationToken) => ({

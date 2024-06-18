@@ -1,8 +1,7 @@
+import { env } from '@/env'
 import { type Config } from 'drizzle-kit'
 
-import { env } from '@/env'
-
-export default {
+const config = {
   schema: './src/server/db/schema.ts',
   dialect: 'mysql',
   dbCredentials: {
@@ -10,3 +9,5 @@ export default {
   },
   tablesFilter: ['egomarket_*'],
 } satisfies Config
+
+export default config
