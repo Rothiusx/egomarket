@@ -21,13 +21,14 @@ import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { type z } from 'zod'
 
-export function EditProfile({ user }: { user: Session['user'] }) {
+export function EditProfile({ session }: { session: Session }) {
   const router = useRouter()
 
   const editProfile = api.profile.edit.useMutation({
-    onSuccess: () => {
+    onSuccess: (user) => {
       router.refresh()
       toast.success('Profile saved!')
+      form.reset({ name: user?.name ?? '', email: user?.email ?? '' })
     },
     onError: (error) => {
       toast.error(error.message)
@@ -40,13 +41,13 @@ export function EditProfile({ user }: { user: Session['user'] }) {
   const form = useForm<z.infer<typeof profileSchema>>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
-      name: user.name ?? '',
-      email: user.email ?? '',
+      name: session.user.name ?? '',
+      email: session.user.email ?? '',
     },
   })
 
   function onSubmit({ name, email }: z.infer<typeof profileSchema>) {
-    if (name === user.name && email === user.email) {
+    if (name === session.user.name && email === session.user.email) {
       toast.error('No changes detected!')
     } else {
       try {
@@ -96,7 +97,7 @@ export function EditProfile({ user }: { user: Session['user'] }) {
         <Button
           className="min-w-32"
           type="submit"
-          disabled={editProfile.isPending}
+          disabled={editProfile.isPending || !form.formState.isDirty}
         >
           {editProfile.isPending ? (
             <ArrowPathIcon className="size-4 animate-spin" />

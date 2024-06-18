@@ -19,7 +19,7 @@ export default async function Page() {
         </AvatarFallback>
       </Avatar>
       <h1 className="text-4xl font-medium">Welcome, {session.user.name}!</h1>
-      <EditProfile user={session.user} />
+      <EditProfile session={session} />
     </section>
   )
 }

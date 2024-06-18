@@ -8,10 +8,10 @@ export const profileRouter = createTRPCRouter({
     .input(profileSchema)
     .mutation(async ({ ctx, input }) => {
       const existingUser = await ctx.db.query.users.findFirst({
-        where: eq(users.id, ctx.session.user.id),
+        where: eq(users.email, input.email),
       })
 
-      if (existingUser && existingUser.email !== input.email) {
+      if (existingUser && existingUser.id !== ctx.session.user.id) {
         throw new Error('Email is already taken!')
       }
 
@@ -22,5 +22,13 @@ export const profileRouter = createTRPCRouter({
           email: input.email,
         })
         .where(eq(users.id, ctx.session.user.id))
+
+      return await ctx.db.query.users.findFirst({
+        columns: {
+          name: true,
+          email: true,
+        },
+        where: eq(users.id, ctx.session.user.id),
+      })
     }),
 })
