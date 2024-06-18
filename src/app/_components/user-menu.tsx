@@ -11,6 +11,7 @@ import {
   ArrowLeftStartOnRectangleIcon,
   ArrowRightEndOnRectangleIcon,
   UserCircleIcon,
+  UserIcon,
 } from '@heroicons/react/24/solid'
 import Link from 'next/link'
 
@@ -30,17 +31,24 @@ export async function UserMenu() {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        {session && (
-          <span className="flex flex-col items-center gap-2 p-4">
-            <Avatar className="h-12 w-12">
-              <AvatarImage src={session.user?.image ?? undefined} />
-              <AvatarFallback>
-                {session.user?.name?.charAt(0).toUpperCase()}
-              </AvatarFallback>
-            </Avatar>
-            <span className="text-lg">{session.user?.name}</span>
-          </span>
-        )}
+        <span className="flex flex-col items-center gap-2 p-4">
+          <Avatar className="h-12 w-12">
+            <AvatarImage src={session?.user?.image ?? undefined} />
+            <AvatarFallback>
+              {session?.user?.name?.charAt(0).toUpperCase() ?? 'P'}
+            </AvatarFallback>
+          </Avatar>
+          <span className="text-lg">{session?.user?.name}</span>
+        </span>
+        <DropdownMenuItem asChild disabled={!session}>
+          <Link
+            className="flex items-center gap-2 px-2 text-lg"
+            href="/profile"
+          >
+            <UserIcon className="size-6" />
+            <span>Profile</span>
+          </Link>
+        </DropdownMenuItem>
         <DropdownMenuItem asChild>
           <Link
             className="flex items-center gap-2 px-2 text-lg"

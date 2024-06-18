@@ -45,7 +45,7 @@ export const historyRouter = createTRPCRouter({
     }),
 
   getRecentHistory: publicProcedure.query(async ({ ctx }) => {
-    const allAuctionsData = await ctx.db.query.history.findMany({
+    const recentHistoryData = await ctx.db.query.history.findMany({
       columns: {
         id: true,
         title: true,
@@ -58,7 +58,7 @@ export const historyRouter = createTRPCRouter({
       limit: 3,
     })
 
-    const allAuctions = z
+    const recentHistory = z
       .array(
         z.object({
           id: z.number(),
@@ -69,12 +69,12 @@ export const historyRouter = createTRPCRouter({
           auctions: auctionsSchema,
         })
       )
-      .parse(allAuctionsData)
+      .parse(recentHistoryData)
 
     const accessToken = await BATTLENET.getAccessToken()
 
     return await Promise.all(
-      allAuctions.map(
+      recentHistory.map(
         async ({ id, title, createdAt, report, totalPot, auctions }, index) => {
           if (index !== 0) {
             await sleep(Object.keys(auctions).length * 30)
