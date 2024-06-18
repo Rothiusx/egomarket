@@ -23,7 +23,7 @@ export async function NavBar() {
             className="flex items-center gap-4 text-3xl text-slate-300"
           >
             <HomeIcon className="size-8" />
-            <h1 className="text-2xl font-semibold tracking-tight">
+            <h1 className="hidden lg:block text-2xl font-semibold tracking-tight">
               EgoMarket <span className="text-[hsl(280,100%,70%)]">GDKP</span>
             </h1>
           </Link>

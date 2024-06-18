@@ -64,7 +64,7 @@ export const historyRouter = createTRPCRouter({
           id: z.number(),
           title: z.string(),
           createdAt: z.date(),
-          report: z.string().url().nullable(),
+          report: z.literal('').or(z.string().url().optional()),
           totalPot: z.number(),
           auctions: auctionsSchema,
         })

@@ -1,6 +1,7 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { getServerAuthSession } from '@/server/auth'
 import { redirect } from 'next/navigation'
+import { EditProfile } from './_components/edit-profile'
 
 export default async function Page() {
   const session = await getServerAuthSession()
@@ -18,6 +19,7 @@ export default async function Page() {
         </AvatarFallback>
       </Avatar>
       <h1 className="text-4xl font-medium">Welcome, {session.user.name}!</h1>
+      <EditProfile user={session.user} />
     </section>
   )
 }

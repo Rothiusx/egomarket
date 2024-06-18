@@ -1,6 +1,7 @@
 import { postRouter } from '@/server/api/routers/post'
 import { createCallerFactory, createTRPCRouter } from '@/server/api/trpc'
 import { historyRouter } from './routers/history'
+import { profileRouter } from './routers/profile'
 
 /**
  * This is the primary router for your server.
@@ -8,6 +9,7 @@ import { historyRouter } from './routers/history'
  * All routers added in /api/routers should be manually added here.
  */
 export const appRouter = createTRPCRouter({
+  profile: profileRouter,
   post: postRouter,
   history: historyRouter,
 })
