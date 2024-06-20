@@ -1,6 +1,7 @@
 import { profileSchema } from '@/schemas/profile'
 import { createTRPCRouter, protectedProcedure } from '@/server/api/trpc'
 import { users } from '@/server/db/schema'
+import { TRPCError } from '@trpc/server'
 import { eq } from 'drizzle-orm'
 
 export const profileRouter = createTRPCRouter({
@@ -12,7 +13,10 @@ export const profileRouter = createTRPCRouter({
       })
 
       if (existingUser && existingUser.id !== ctx.session.user.id) {
-        throw new Error('Email is already taken!')
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'Email is already in use!',
+        })
       }
 
       await ctx.db
@@ -22,13 +26,5 @@ export const profileRouter = createTRPCRouter({
           email: input.email,
         })
         .where(eq(users.id, ctx.session.user.id))
-
-      return await ctx.db.query.users.findFirst({
-        columns: {
-          name: true,
-          email: true,
-        },
-        where: eq(users.id, ctx.session.user.id),
-      })
     }),
 })

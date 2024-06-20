@@ -1,6 +1,5 @@
 'use client'
 
-import { Button } from '@/components/ui/button'
 import {
   Form,
   FormControl,
@@ -10,25 +9,27 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form'
+import { IconHoverButton } from '@/components/ui/icon-hover-button'
 import { Input } from '@/components/ui/input'
 import { profileSchema } from '@/schemas/profile'
 import { api } from '@/trpc/react'
-import { ArrowPathIcon } from '@heroicons/react/24/outline'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { LoaderCircle, SaveAll } from 'lucide-react'
 import { type Session } from 'next-auth'
 import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { type z } from 'zod'
 
-export function EditProfile({ session }: { session: Session }) {
+export function EditProfile({ user }: { user: Session['user'] }) {
   const router = useRouter()
 
   const editProfile = api.profile.edit.useMutation({
-    onSuccess: (user) => {
+    onSuccess: () => {
+      const { name, email } = form.getValues()
+      form.reset({ name, email })
       router.refresh()
       toast.success('Profile saved!')
-      form.reset({ name: user?.name ?? '', email: user?.email ?? '' })
     },
     onError: (error) => {
       toast.error(error.message)
@@ -41,13 +42,13 @@ export function EditProfile({ session }: { session: Session }) {
   const form = useForm<z.infer<typeof profileSchema>>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
-      name: session.user.name ?? '',
-      email: session.user.email ?? '',
+      name: user.name ?? '',
+      email: user.email ?? '',
     },
   })
 
   function onSubmit({ name, email }: z.infer<typeof profileSchema>) {
-    if (name === session.user.name && email === session.user.email) {
+    if (name === user.name && email === user.email) {
       toast.error('No changes detected!')
     } else {
       try {
@@ -94,17 +95,18 @@ export function EditProfile({ session }: { session: Session }) {
             </FormItem>
           )}
         />
-        <Button
+        <IconHoverButton
           className="min-w-32"
+          icon={<SaveAll className="size-4" />}
           type="submit"
           disabled={editProfile.isPending || !form.formState.isDirty}
         >
           {editProfile.isPending ? (
-            <ArrowPathIcon className="size-4 animate-spin" />
+            <LoaderCircle className="size-4 animate-spin" />
           ) : (
             'Save Profile'
           )}
-        </Button>
+        </IconHoverButton>
       </form>
     </Form>
   )
