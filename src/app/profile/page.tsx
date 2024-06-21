@@ -11,7 +11,7 @@ export default async function Page() {
   }
 
   return (
-    <section className="container flex flex-col items-center justify-center gap-8 px-4 py-16">
+    <section className="container flex flex-col items-center justify-center gap-8 px-4 py-8">
       <Avatar className="size-48">
         <AvatarImage src={session.user.image ?? undefined} />
         <AvatarFallback>

@@ -18,7 +18,7 @@ export default async function Home() {
   const session = await getServerAuthSession()
 
   return (
-    <section className="container flex flex-col items-center justify-center gap-8 px-4 py-16">
+    <section className="container flex flex-col items-center justify-center gap-8 px-4 py-8">
       <h1 className="text-4xl font-extrabold tracking-tight lg:text-6xl">
         EgoMarket <span className="text-[hsl(280,100%,70%)]">GDKP</span>
       </h1>

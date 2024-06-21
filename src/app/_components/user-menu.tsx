@@ -26,16 +26,21 @@ export async function UserMenu() {
           size="icon"
           className="rounded-full text-slate-300 hover:bg-slate-600"
         >
-          <UserCircleIcon className="size-8" />
+          <Avatar className="size-8">
+            <AvatarImage src={session?.user?.image ?? undefined} />
+            <AvatarFallback className="bg-inherit">
+              <UserCircleIcon />
+            </AvatarFallback>
+          </Avatar>
           <span className="sr-only">Open user menu</span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <span className="flex flex-col items-center gap-2 p-4">
-          <Avatar className="h-12 w-12">
+          <Avatar className="size-16">
             <AvatarImage src={session?.user?.image ?? undefined} />
-            <AvatarFallback>
-              {session?.user?.name?.charAt(0).toUpperCase() ?? 'P'}
+            <AvatarFallback className="bg-inherit">
+              <UserCircleIcon />
             </AvatarFallback>
           </Avatar>
           <span className="text-lg">{session?.user?.name}</span>
