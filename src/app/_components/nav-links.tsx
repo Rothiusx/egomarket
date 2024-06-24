@@ -20,6 +20,7 @@ export function NavLinks({ links }: NavLinksProps) {
         <li key={href}>
           <Link
             href={href}
+            prefetch={true}
             className={`flex items-center gap-2 rounded-lg px-4 py-1 text-2xl transition-colors hover:bg-slate-700/50 ${
               pathname === href
                 ? 'bg-slate-700/50 text-slate-100'

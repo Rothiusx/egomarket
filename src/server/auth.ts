@@ -3,9 +3,12 @@ import {
   getServerSession,
   type DefaultSession,
   type NextAuthOptions,
+  type RequestInternal,
+  type User,
 } from 'next-auth'
 import { type Adapter } from 'next-auth/adapters'
 import BattleNetProvider from 'next-auth/providers/battlenet'
+import CredentialsProvider from 'next-auth/providers/credentials'
 import DiscordProvider from 'next-auth/providers/discord'
 import GitHubProvider from 'next-auth/providers/github'
 
@@ -18,6 +21,7 @@ import {
   users,
   verificationTokens,
 } from '@/server/db/schema'
+import axios from 'axios'
 
 /**
  * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`
@@ -62,7 +66,34 @@ export const authOptions: NextAuthOptions = {
     verificationTokensTable: verificationTokens,
     authenticatorsTable: authenticators,
   }) as Adapter,
+  pages: {
+    signIn: '/auth/signin',
+    signOut: '/auth/signout',
+  },
   providers: [
+    CredentialsProvider({
+      credentials: {
+        username: { label: 'Username', type: 'text' },
+        password: { label: 'Password', type: 'password' },
+      },
+      authorize: async function (
+        credentials: Record<'username' | 'password', string> | undefined,
+        req: Pick<RequestInternal, 'query' | 'body' | 'headers' | 'method'>
+      ): Promise<User | null> {
+        const res = await axios.post<{ username: string }>('/api/auth/signin', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          data: credentials,
+        })
+
+        const user = res.data
+        console.log(user)
+
+        return user ? user : null
+      },
+    }),
     DiscordProvider({
       clientId: env.DISCORD_CLIENT_ID,
       clientSecret: env.DISCORD_CLIENT_SECRET,
