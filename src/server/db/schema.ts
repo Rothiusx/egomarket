@@ -90,6 +90,7 @@ export const users = createTable('user', {
     mode: 'date',
     fsp: 3,
   }),
+  password: varchar('password', { length: 255 }),
   image: varchar('image', { length: 255 }),
 })
 

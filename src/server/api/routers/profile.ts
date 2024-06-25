@@ -14,7 +14,7 @@ export const profileRouter = createTRPCRouter({
 
       if (existingUser && existingUser.id !== ctx.session.user.id) {
         throw new TRPCError({
-          code: 'BAD_REQUEST',
+          code: 'CONFLICT',
           message: 'Email is already in use!',
         })
       }

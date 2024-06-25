@@ -10,7 +10,8 @@ import {
 } from '@/components/ui/form'
 import { IconHoverButton } from '@/components/ui/icon-hover-button'
 import { Input } from '@/components/ui/input'
-import { credentialsSchema } from '@/schemas/auth'
+import { signUpSchema } from '@/schemas/auth'
+import { api } from '@/trpc/react'
 import { ArrowRightEndOnRectangleIcon } from '@heroicons/react/24/outline'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { signIn } from 'next-auth/react'
@@ -19,34 +20,46 @@ import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { type z } from 'zod'
 
-export function CredentialsForm() {
+export function SignUpForm() {
   const router = useRouter()
 
-  const form = useForm<z.infer<typeof credentialsSchema>>({
-    resolver: zodResolver(credentialsSchema),
+  const signUp = api.auth.signUp.useMutation({
+    onSuccess: () => {
+      toast.success('Account created!')
+    },
+    onSettled: async () => {
+      await signIn('credentials', {
+        email: form.getValues().email,
+        password: form.getValues().password,
+        redirect: false,
+      }).then((response) => {
+        if (response?.ok) {
+          router.refresh()
+        } else {
+          console.error(response)
+        }
+      })
+    },
+  })
+
+  const form = useForm<z.infer<typeof signUpSchema>>({
+    resolver: zodResolver(signUpSchema),
     defaultValues: {
       email: '',
       password: '',
+      confirmPassword: '',
     },
   })
 
   async function onSubmit({
     email,
     password,
-  }: z.infer<typeof credentialsSchema>) {
-    console.log(email, password)
-    await signIn('credentials', {
+    confirmPassword,
+  }: z.infer<typeof signUpSchema>) {
+    signUp.mutate({
       email,
       password,
-      redirect: false,
-    }).then((response) => {
-      if (response?.ok) {
-        router.refresh()
-        toast.success('Signed in!')
-      } else {
-        console.error(response)
-        toast.error('Wrong credentials!')
-      }
+      confirmPassword,
     })
   }
 
@@ -82,13 +95,26 @@ export function CredentialsForm() {
             </FormItem>
           )}
         />
+        <FormField
+          control={form.control}
+          name="confirmPassword"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Confirm your password</FormLabel>
+              <FormControl>
+                <Input type="password" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
         <IconHoverButton
           className="min-w-32 mt-8"
           icon={<ArrowRightEndOnRectangleIcon className="size-6" />}
           type="submit"
-          disabled={form.formState.isSubmitting}
+          disabled={signUp.isPending}
         >
-          Sign In
+          Sign Up
         </IconHoverButton>
       </form>
     </Form>

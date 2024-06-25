@@ -1,4 +1,5 @@
 import { DrizzleAdapter } from '@auth/drizzle-adapter'
+import bcrypt from 'bcryptjs'
 import {
   getServerSession,
   type DefaultSession,
@@ -21,7 +22,7 @@ import {
   users,
   verificationTokens,
 } from '@/server/db/schema'
-import axios from 'axios'
+import { eq } from 'drizzle-orm'
 
 /**
  * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`
@@ -51,11 +52,18 @@ declare module 'next-auth' {
  */
 export const authOptions: NextAuthOptions = {
   callbacks: {
-    session: ({ session, user }) => ({
+    jwt: async ({ token, user }) => {
+      if (user) {
+        token.id = user.id
+      }
+
+      return token
+    },
+    session: ({ session, token }) => ({
       ...session,
       user: {
         ...session.user,
-        id: user.id,
+        id: token.id,
       },
     }),
   },
@@ -66,52 +74,54 @@ export const authOptions: NextAuthOptions = {
     verificationTokensTable: verificationTokens,
     authenticatorsTable: authenticators,
   }) as Adapter,
+  session: {
+    strategy: 'jwt',
+  },
   pages: {
     signIn: '/auth/signin',
-    signOut: '/auth/signout',
   },
   providers: [
     CredentialsProvider({
       credentials: {
-        username: { label: 'Username', type: 'text' },
+        email: { label: 'Email', type: 'text' },
         password: { label: 'Password', type: 'password' },
       },
       authorize: async function (
-        credentials: Record<'username' | 'password', string> | undefined,
-        req: Pick<RequestInternal, 'query' | 'body' | 'headers' | 'method'>
+        credentials: Record<'email' | 'password', string> | undefined,
+        request: Pick<RequestInternal, 'query' | 'body' | 'headers' | 'method'>
       ): Promise<User | null> {
-        const res = await axios.post<{ username: string }>('/api/auth/signin', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          data: credentials,
+        if (!credentials?.email || !credentials?.password) {
+          throw new Error('Missing credentials!')
+        }
+
+        const user = await db.query.users.findFirst({
+          where: eq(users.email, credentials.email),
         })
 
-        const user = res.data
-        console.log(user)
+        if (user && !user.password) {
+          throw new Error('Sign in using your previous provider!')
+        }
 
-        return user ? user : null
+        if (!user) {
+          return null
+        }
+
+        const isAuthenticated = await bcrypt.compare(
+          credentials.password,
+          user.password ?? ''
+        )
+
+        return isAuthenticated ? user : null
       },
     }),
     DiscordProvider({
       clientId: env.DISCORD_CLIENT_ID,
       clientSecret: env.DISCORD_CLIENT_SECRET,
     }),
-    /**
-     * ...add more providers here.
-     *
-     * Most other providers require a bit more work than the Discord provider. For example, the
-     * GitHub provider requires you to add the `refresh_token_expires_in` field to the Account
-     * model. Refer to the NextAuth.js docs for the provider you want to use. Example:
-     *
-     * @see https://next-auth.js.org/providers/github
-     */
     GitHubProvider({
       clientId: env.GITHUB_CLIENT_ID,
       clientSecret: env.GITHUB_CLIENT_SECRET,
     }),
-
     BattleNetProvider({
       clientId: env.BATTLENET_CLIENT_ID,
       clientSecret: env.BATTLENET_CLIENT_SECRET,
@@ -121,20 +131,6 @@ export const authOptions: NextAuthOptions = {
           scope: 'openid wow.profile',
         },
       },
-      // userinfo: {
-      //   async request(context) {
-      //     const response = await axios.get(
-      //       'https://oauth.battle.net/userinfo',
-      //       {
-      //         headers: {
-      //           Authorization: `Bearer ${context.tokens.access_token}`,
-      //         },
-      //       }
-      //     )
-      //     console.log('USER INFO', response.data)
-      //     return response.data
-      //   },
-      // },
       profile(profile: { sub: string; battle_tag: string }) {
         return {
           id: profile.sub,
