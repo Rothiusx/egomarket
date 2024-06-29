@@ -50,15 +50,16 @@ export function SignInForm() {
       password,
       redirect: false,
     }).then((response) => {
-      if (response?.ok) {
-        router.refresh()
-        toast.success('Signed in!')
-      } else {
+      console.log(response)
+      if (response?.error) {
         console.error(response)
         setMessage({
           variant: 'error',
           message: response?.error,
         })
+      } else if (response?.ok) {
+        router.refresh()
+        toast.success('User signed in!')
       }
     })
   }
