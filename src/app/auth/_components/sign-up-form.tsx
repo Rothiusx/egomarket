@@ -10,6 +10,7 @@ import {
 } from '@/components/ui/form'
 import { IconHoverButton } from '@/components/ui/icon-hover-button'
 import { Input } from '@/components/ui/input'
+import { PasswordInput } from '@/components/ui/password-input'
 import { signUpSchema } from '@/schemas/auth'
 import { api } from '@/trpc/react'
 import { ArrowRightEndOnRectangleIcon } from '@heroicons/react/24/outline'
@@ -89,7 +90,7 @@ export function SignUpForm() {
             <FormItem>
               <FormLabel>Password</FormLabel>
               <FormControl>
-                <Input type="password" {...field} />
+                <PasswordInput {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -102,7 +103,7 @@ export function SignUpForm() {
             <FormItem>
               <FormLabel>Confirm your password</FormLabel>
               <FormControl>
-                <Input type="password" {...field} />
+                <PasswordInput {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>

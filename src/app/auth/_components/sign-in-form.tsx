@@ -10,6 +10,7 @@ import {
 } from '@/components/ui/form'
 import { IconHoverButton } from '@/components/ui/icon-hover-button'
 import { Input } from '@/components/ui/input'
+import { PasswordInput } from '@/components/ui/password-input'
 import {
   StatusMessage,
   type StatusMessageProps,
@@ -88,7 +89,7 @@ export function SignInForm() {
             <FormItem>
               <FormLabel>Password</FormLabel>
               <FormControl>
-                <Input type="password" {...field} />
+                <PasswordInput {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
