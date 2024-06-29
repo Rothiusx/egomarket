@@ -27,7 +27,7 @@ export default async function Page() {
         </AvatarFallback>
       </Avatar>
       <h1 className="text-4xl font-medium">Welcome, {session.user.name}!</h1>
-      <Card>
+      <Card className="w-1/3 min-w-fit">
         <CardHeader>
           <CardTitle>Edit Profile</CardTitle>
           <CardDescription>Update your profile information</CardDescription>
