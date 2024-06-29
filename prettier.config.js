@@ -4,7 +4,7 @@ const config = {
   singleQuote: true,
   trailingComma: 'es5',
   endOfLine: 'auto',
-  plugins: ['prettier-plugin-tailwindcss', 'prettier-plugin-organize-imports'],
+  plugins: ['prettier-plugin-organize-imports', 'prettier-plugin-tailwindcss'],
   organizeImportsSkipDestructiveCodeActions: true,
 }
 

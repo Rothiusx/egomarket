@@ -14,7 +14,7 @@ export default async function Page() {
       {session?.user.roles === 'ADMIN' && (
         <Link
           href="/history/upload"
-          className="rounded-lg bg-slate-700 px-4 py-2 hover:bg-slate-700/50 transition-colors"
+          className="rounded-lg bg-slate-700 px-4 py-2 transition-colors hover:bg-slate-700/50"
         >
           Upload GDKP history
         </Link>

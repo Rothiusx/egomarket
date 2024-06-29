@@ -18,9 +18,9 @@ import { SignUpForm } from './sign-up-form'
 
 export function SignInOptions() {
   return (
-    <div className="flex flex-col items-center gap-8 mt-16">
+    <div className="mt-16 flex flex-col items-center gap-8">
       <Tabs defaultValue="sign-in" className="w-[24rem]">
-        <TabsList className="grid grid-cols-2 w-full ">
+        <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="sign-in">Sign In</TabsTrigger>
           <TabsTrigger value="sign-up">Sign Up</TabsTrigger>
         </TabsList>
@@ -50,7 +50,7 @@ export function SignInOptions() {
         </TabsContent>
       </Tabs>
 
-      <div className="flex gap-8 items-start justify-center w-full">
+      <div className="flex w-full items-start justify-center gap-8">
         {[
           {
             id: 'discord',
@@ -72,7 +72,7 @@ export function SignInOptions() {
             key={id}
             variant="icon"
             size="icon-lg"
-            className="bg-slate-400 hover:shadow-md rounded-lg transition flex-grow hover:bg-slate-400/50 dark:hover:bg-slate-800/50 dark:bg-slate-800"
+            className="flex-grow rounded-lg bg-slate-400 transition hover:bg-slate-400/50 hover:shadow-md dark:bg-slate-800 dark:hover:bg-slate-800/50"
             onClick={() => signIn(id)}
           >
             {icon}

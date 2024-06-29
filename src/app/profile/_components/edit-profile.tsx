@@ -124,7 +124,7 @@ export function EditProfile({ session }: { session: Session }) {
         />
         <StatusMessage {...message} />
         <IconHoverButton
-          className="min-w-32 float-right"
+          className="float-right min-w-32"
           icon={<SaveAll className="size-4" />}
           type="submit"
           disabled={editProfile.isPending || !form.formState.isDirty}

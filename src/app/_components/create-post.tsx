@@ -64,7 +64,7 @@ export function CreatePost() {
         <IconHoverButton
           icon={<CheckIcon className="size-4" />}
           type="submit"
-          className="bg-slate-800 !mt-2 w-full px-10 py-3 font-semibold transition-colors hover:bg-slate-800/50"
+          className="!mt-2 w-full bg-slate-800 px-10 py-3 font-semibold transition-colors hover:bg-slate-800/50"
           disabled={createPost.isPending}
         >
           {createPost.isPending ? (

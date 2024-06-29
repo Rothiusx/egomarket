@@ -67,7 +67,7 @@ export function SignInForm() {
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="gap-4 flex flex-col"
+        className="flex flex-col gap-4"
       >
         <FormField
           control={form.control}
@@ -97,7 +97,7 @@ export function SignInForm() {
         />
         <StatusMessage {...message} />
         <IconHoverButton
-          className="min-w-32 mt-8"
+          className="mt-8 min-w-32"
           icon={<ArrowRightEndOnRectangleIcon className="size-6" />}
           type="submit"
           disabled={form.formState.isSubmitting}

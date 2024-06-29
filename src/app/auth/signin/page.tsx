@@ -10,7 +10,7 @@ export default async function Page() {
   }
 
   return (
-    <section className="container flex items-center flex-col">
+    <section className="container flex flex-col items-center">
       <SignInOptions />
     </section>
   )

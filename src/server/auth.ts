@@ -4,7 +4,6 @@ import {
   getServerSession,
   type DefaultSession,
   type NextAuthOptions,
-  type RequestInternal,
   type User,
 } from 'next-auth'
 import { type Adapter } from 'next-auth/adapters'
@@ -71,7 +70,7 @@ export const authOptions: NextAuthOptions = {
 
       return true
     },
-    jwt: async ({ token, trigger, session }) => {
+    jwt: async ({ token, trigger }) => {
       if (trigger === 'update') {
         if (!token.sub) {
           return token
@@ -151,20 +150,11 @@ export const authOptions: NextAuthOptions = {
   providers: [
     CredentialsProvider({
       credentials: {
-        email: {
-          label: 'Email',
-          type: 'email',
-          placeholder: '',
-        },
-        password: {
-          label: 'Password',
-          type: 'password',
-          placeholder: '',
-        },
+        email: {},
+        password: {},
       },
       authorize: async function (
         credentials: Record<'email' | 'password', string> | undefined
-        //request: Pick<RequestInternal, 'query' | 'body' | 'headers' | 'method'>
       ): Promise<User | null> {
         if (!credentials?.email || !credentials?.password) {
           throw new Error('Missing credentials!')
