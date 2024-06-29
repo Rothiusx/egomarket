@@ -5,7 +5,7 @@ import axios from 'axios'
 const encryptionKey = env.BATTLENET_ENCRYPTION_KEY
 const identifier = env.BATTLENET_TOKEN_IDENTIFIER
 
-export const BATTLENET = {
+export const BattleNet = {
   getAccessToken,
 }
 

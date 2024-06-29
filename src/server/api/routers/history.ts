@@ -5,10 +5,10 @@ import {
   protectedProcedure,
   publicProcedure,
 } from '@/server/api/trpc'
-import { history } from '@/server/db/schema'
-import { BATTLENET } from '@/tokens/blizzard/token'
+import { history, items } from '@/server/db/schema'
+import { BattleNet } from '@/tokens/blizzard/token'
 import axios, { isAxiosError } from 'axios'
-import { desc } from 'drizzle-orm'
+import { desc, eq } from 'drizzle-orm'
 import { z } from 'zod'
 
 export const historyRouter = createTRPCRouter({
@@ -71,14 +71,14 @@ export const historyRouter = createTRPCRouter({
       )
       .parse(recentHistoryData)
 
-    const accessToken = await BATTLENET.getAccessToken()
+    const accessToken = await BattleNet.getAccessToken()
 
     return await Promise.all(
       recentHistory.map(
-        async ({ id, title, createdAt, report, totalPot, auctions }, index) => {
-          if (index !== 0) {
-            await sleep(Object.keys(auctions).length * 30)
-          }
+        async (
+          { id, title, createdAt, report, totalPot, auctions },
+          historyIndex
+        ) => {
           return {
             id,
             title,
@@ -90,8 +90,28 @@ export const historyRouter = createTRPCRouter({
                 .filter((auction) => auction.itemID && auction.price)
                 .sort((a, b) => (b?.price ?? 0) - (a?.price ?? 0))
                 .map(async (auction, index) => {
-                  await sleep((index % 3) * 1000)
+                  const existingItem = await ctx.db.query.items.findFirst({
+                    where: eq(items.id, auction.itemID),
+                  })
+
+                  if (existingItem) {
+                    return {
+                      id: auction.itemID,
+                      name:
+                        auction.itemID === 45978
+                          ? '[Gold added manually]'
+                          : auction.itemLink,
+                      price: auction.price,
+                      icon: existingItem.icon,
+                    }
+                  }
+
                   try {
+                    await sleep(
+                      (index % 3) * 1000 + historyIndex !== 0
+                        ? Object.keys(auctions).length * 30
+                        : 0
+                    )
                     const itemMedia = await axios.get<WarcraftItemMedia>(
                       `https://eu.api.blizzard.com/data/wow/media/item/${auction.itemID}?namespace=static-eu&locale=en_GB`,
                       {
@@ -101,6 +121,13 @@ export const historyRouter = createTRPCRouter({
                         },
                       }
                     )
+
+                    await ctx.db.insert(items).values({
+                      id: auction.itemID,
+                      icon: itemMedia.data.assets[0]?.value ?? '',
+                      mediaId: itemMedia.data.assets[0]?.file_data_id ?? 0,
+                    })
+
                     return {
                       id: auction.itemID,
                       name:

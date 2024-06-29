@@ -76,6 +76,12 @@ export const historyRelations = relations(history, ({ one }) => ({
   user: one(users, { fields: [history.uploadedById], references: [users.id] }),
 }))
 
+export const items = createTable('items', {
+  id: bigint('id', { mode: 'number' }).notNull().primaryKey(),
+  mediaId: bigint('media_id', { mode: 'number' }).notNull(),
+  icon: varchar('image', { length: 255 }).notNull(),
+})
+
 /**
  * ! IMPORTANT: The following tables are used by NextAuth.js for authentication!
  */
