@@ -117,7 +117,11 @@ export function EditProfile({ session }: { session: Session }) {
                   {...field}
                 />
               </FormControl>
-              <FormDescription>Your email address</FormDescription>
+              <FormDescription>
+                {session.user.oauth
+                  ? 'You cannot change your email address'
+                  : 'Your email address'}
+              </FormDescription>
               <FormMessage />
             </FormItem>
           )}

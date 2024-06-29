@@ -57,7 +57,7 @@ export async function UserMenu() {
         <DropdownMenuItem asChild>
           <Link
             className="flex items-center gap-2 px-2 text-lg"
-            href={session ? '/api/auth/signout' : '/api/auth/signin'}
+            href={session ? '/api/auth/signout' : '/auth/signin'}
           >
             {session ? (
               <>

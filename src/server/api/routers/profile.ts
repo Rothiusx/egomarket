@@ -26,7 +26,7 @@ export const profileRouter = createTRPCRouter({
       ) {
         throw new TRPCError({
           code: 'FORBIDDEN',
-          message: 'Cannot edit email of OAuth account!',
+          message: 'Cannot edit email using an OAuth account!',
         })
       }
 

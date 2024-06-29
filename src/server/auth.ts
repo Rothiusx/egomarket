@@ -147,6 +147,8 @@ export const authOptions: NextAuthOptions = {
   },
   pages: {
     signIn: '/auth/signin',
+    verifyRequest: '/auth/error',
+    error: '/auth/error',
   },
   providers: [
     CredentialsProvider({

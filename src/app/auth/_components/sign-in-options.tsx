@@ -1,5 +1,6 @@
 'use client'
 
+import { getAuthError } from '@/auth/error'
 import { BattleNetIcon } from '@/components/icons/battlenet'
 import { DiscordIcon } from '@/components/icons/discord'
 import { GitHubIcon } from '@/components/icons/github'
@@ -11,12 +12,33 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
+import {
+  StatusMessage,
+  type StatusMessageProps,
+} from '@/components/ui/status-message'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { signIn } from 'next-auth/react'
+import { useSearchParams } from 'next/navigation'
+import { useEffect, useState } from 'react'
 import { SignInForm } from './sign-in-form'
 import { SignUpForm } from './sign-up-form'
 
 export function SignInOptions() {
+  const searchParams = useSearchParams()
+  const [message, setMessage] = useState<StatusMessageProps>(undefined!)
+
+  useEffect(() => {
+    if (searchParams.has('error')) {
+      const authError = getAuthError(searchParams.get('error'))
+      console.error(authError)
+
+      setMessage({
+        variant: 'error',
+        message: authError.message,
+      })
+    }
+  }, [searchParams])
+
   return (
     <div className="mt-16 flex flex-col items-center gap-8">
       <Tabs defaultValue="sign-in" className="w-[24rem]">
@@ -49,7 +71,7 @@ export function SignInOptions() {
           </Card>
         </TabsContent>
       </Tabs>
-
+      <StatusMessage {...message} />
       <div className="flex w-full items-start justify-center gap-8">
         {[
           {
