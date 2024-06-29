@@ -15,7 +15,7 @@ import {
   StatusMessage,
   type StatusMessageProps,
 } from '@/components/ui/status-message'
-import { credentialsSchema } from '@/schemas/auth'
+import { signInSchema } from '@/schemas/auth'
 import { ArrowRightEndOnRectangleIcon } from '@heroicons/react/24/outline'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { signIn } from 'next-auth/react'
@@ -29,8 +29,8 @@ export function SignInForm() {
   const router = useRouter()
   const [message, setMessage] = useState<StatusMessageProps>(undefined!)
 
-  const form = useForm<z.infer<typeof credentialsSchema>>({
-    resolver: zodResolver(credentialsSchema),
+  const form = useForm<z.infer<typeof signInSchema>>({
+    resolver: zodResolver(signInSchema),
     defaultValues: {
       email: '',
       password: '',
@@ -41,10 +41,7 @@ export function SignInForm() {
     setMessage(undefined!)
   }, [form.formState.isDirty])
 
-  async function onSubmit({
-    email,
-    password,
-  }: z.infer<typeof credentialsSchema>) {
+  async function onSubmit({ email, password }: z.infer<typeof signInSchema>) {
     await signIn('credentials', {
       email,
       password,
