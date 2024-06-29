@@ -6,6 +6,7 @@ import Link from 'next/link'
 
 export default async function Page() {
   const session = await getServerAuthSession()
+
   const recentHistory = await api.history.getRecentHistory()
 
   return (

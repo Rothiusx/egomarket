@@ -14,12 +14,12 @@ export default async function Page() {
     <section className="container flex flex-col items-center justify-center gap-8 px-4 py-8">
       <Avatar className="size-48">
         <AvatarImage src={session.user.image ?? undefined} />
-        <AvatarFallback>
+        <AvatarFallback className="text-6xl">
           {session.user.name?.charAt(0).toUpperCase()}
         </AvatarFallback>
       </Avatar>
       <h1 className="text-4xl font-medium">Welcome, {session.user.name}!</h1>
-      <EditProfile user={session.user} />
+      <EditProfile session={session} />
     </section>
   )
 }

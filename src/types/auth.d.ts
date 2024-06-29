@@ -1,0 +1,1 @@
+type UserRole = 'USER' | 'ADMIN'

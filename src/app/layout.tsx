@@ -2,9 +2,11 @@ import '@/styles/globals.css'
 
 import { GeistSans } from 'geist/font/sans'
 
+import { AuthSessionProvider } from '@/auth/react'
 import { ThemeProvider } from '@/components/theme-provider'
 import { Toaster } from '@/components/ui/sonner'
 import { cn } from '@/lib/utils'
+import { getServerAuthSession } from '@/server/auth'
 import { TRPCReactProvider } from '@/trpc/react'
 import { NavBar } from './_components/nav-bar'
 
@@ -14,11 +16,13 @@ export const metadata = {
   icons: [{ rel: 'icon', url: '/favicon.ico' }],
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
+  const session = await getServerAuthSession()
+
   return (
     <html
       lang="en"
@@ -41,7 +45,9 @@ export default function RootLayout({
             <NavBar />
           </header>
           <main className="flex flex-grow flex-col p-2">
-            <TRPCReactProvider>{children}</TRPCReactProvider>
+            <AuthSessionProvider session={session}>
+              <TRPCReactProvider>{children}</TRPCReactProvider>
+            </AuthSessionProvider>
           </main>
           <Toaster richColors />
         </ThemeProvider>

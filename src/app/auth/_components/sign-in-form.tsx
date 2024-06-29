@@ -10,17 +10,23 @@ import {
 } from '@/components/ui/form'
 import { IconHoverButton } from '@/components/ui/icon-hover-button'
 import { Input } from '@/components/ui/input'
+import {
+  StatusMessage,
+  type StatusMessageProps,
+} from '@/components/ui/status-message'
 import { credentialsSchema } from '@/schemas/auth'
 import { ArrowRightEndOnRectangleIcon } from '@heroicons/react/24/outline'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { signIn } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
+import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { type z } from 'zod'
 
-export function CredentialsForm() {
+export function SignInForm() {
   const router = useRouter()
+  const [message, setMessage] = useState<StatusMessageProps>(undefined!)
 
   const form = useForm<z.infer<typeof credentialsSchema>>({
     resolver: zodResolver(credentialsSchema),
@@ -30,11 +36,14 @@ export function CredentialsForm() {
     },
   })
 
+  useEffect(() => {
+    setMessage(undefined!)
+  }, [form.formState.isDirty])
+
   async function onSubmit({
     email,
     password,
   }: z.infer<typeof credentialsSchema>) {
-    console.log(email, password)
     await signIn('credentials', {
       email,
       password,
@@ -45,7 +54,10 @@ export function CredentialsForm() {
         toast.success('Signed in!')
       } else {
         console.error(response)
-        toast.error('Wrong credentials!')
+        setMessage({
+          variant: 'error',
+          message: response?.error,
+        })
       }
     })
   }
@@ -82,6 +94,7 @@ export function CredentialsForm() {
             </FormItem>
           )}
         />
+        <StatusMessage {...message} />
         <IconHoverButton
           className="min-w-32 mt-8"
           icon={<ArrowRightEndOnRectangleIcon className="size-6" />}

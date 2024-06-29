@@ -13,14 +13,14 @@ import {
 } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { signIn } from 'next-auth/react'
-import { CredentialsForm } from './credentials-form'
+import { SignInForm } from './sign-in-form'
 import { SignUpForm } from './sign-up-form'
 
 export function SignInOptions() {
   return (
     <div className="flex flex-col items-center gap-8 mt-16">
       <Tabs defaultValue="sign-in" className="w-[24rem]">
-        <TabsList className="grid w-full grid-cols-2">
+        <TabsList className="grid grid-cols-2 w-full ">
           <TabsTrigger value="sign-in">Sign In</TabsTrigger>
           <TabsTrigger value="sign-up">Sign Up</TabsTrigger>
         </TabsList>
@@ -31,7 +31,7 @@ export function SignInOptions() {
               <CardDescription>Sign in to access your account.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-2">
-              <CredentialsForm />
+              <SignInForm />
             </CardContent>
           </Card>
         </TabsContent>
@@ -50,7 +50,7 @@ export function SignInOptions() {
         </TabsContent>
       </Tabs>
 
-      <div className="flex gap-8 items-start justify-center">
+      <div className="flex gap-8 items-start justify-center w-full">
         {[
           {
             id: 'discord',
@@ -72,7 +72,7 @@ export function SignInOptions() {
             key={id}
             variant="icon"
             size="icon-lg"
-            className="rounded-lg bg-slate-400 hover:shadow-md transition hover:bg-slate-400/50 dark:hover:bg-slate-800/50 dark:bg-slate-800"
+            className="bg-slate-400 hover:shadow-md rounded-lg transition flex-grow hover:bg-slate-400/50 dark:hover:bg-slate-800/50 dark:bg-slate-800"
             onClick={() => signIn(id)}
           >
             {icon}

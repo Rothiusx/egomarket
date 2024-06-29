@@ -1,5 +1,5 @@
 import { DrizzleAdapter } from '@auth/drizzle-adapter'
-import bcrypt from 'bcryptjs'
+import bcrypt from 'bcrypt'
 import {
   getServerSession,
   type DefaultSession,
@@ -17,7 +17,6 @@ import { env } from '@/env'
 import { db } from '@/server/db'
 import {
   accounts,
-  authenticators,
   sessions,
   users,
   verificationTokens,
@@ -31,18 +30,23 @@ import { eq } from 'drizzle-orm'
  * @see https://next-auth.js.org/getting-started/typescript#module-augmentation
  */
 declare module 'next-auth' {
-  interface Session extends DefaultSession {
+  interface Session {
     user: {
       id: string
-      // ...other properties
-      // role: UserRole;
+      roles: UserRole
     } & DefaultSession['user']
   }
-
   // interface User {
   //   // ...other properties
   //   // role: UserRole;
   // }
+}
+
+declare module 'next-auth/jwt' {
+  interface JWT {
+    sub: string
+    roles: UserRole
+  }
 }
 
 /**
@@ -52,27 +56,82 @@ declare module 'next-auth' {
  */
 export const authOptions: NextAuthOptions = {
   callbacks: {
-    jwt: async ({ token, user }) => {
-      if (user) {
-        token.id = user.id
+    signIn: async ({ user }) => {
+      const existingUser = await db.query.users.findFirst({
+        where: eq(users.id, user.id),
+      })
+
+      if (!existingUser?.emailVerified) {
+        return true
+      }
+
+      return true
+    },
+    jwt: async ({ token, trigger, session }) => {
+      // console.log('🚀 token', { jwt: token })
+      // console.log('🚀 trigger', { jwt: trigger })
+
+      if (trigger === 'update') {
+        if (!token.sub) {
+          return token
+        }
+
+        const existingUser = await db.query.users.findFirst({
+          columns: {
+            email: true,
+            name: true,
+            roles: true,
+          },
+          where: eq(users.id, token.sub),
+        })
+
+        if (!existingUser) {
+          return token
+        }
+
+        token.email = existingUser.email
+        token.name = existingUser.name
+        token.roles = existingUser.roles
       }
 
       return token
     },
-    session: ({ session, token }) => ({
-      ...session,
-      user: {
-        ...session.user,
-        id: token.id,
-      },
-    }),
+    session: ({ session, token }) => {
+      // console.log('🚀 token', { session: token })
+
+      if (session.user && token.sub) {
+        session.user.id = token.sub
+      }
+
+      if (session.user && token.roles) {
+        session.user.roles = token.roles
+      }
+
+      // return session
+      return {
+        ...session,
+        user: {
+          ...session.user,
+          id: token.sub,
+        },
+      }
+    },
+  },
+  events: {
+    linkAccount: async ({ user }) => {
+      await db
+        .update(users)
+        .set({
+          emailVerified: new Date(),
+        })
+        .where(eq(users.id, user.id))
+    },
   },
   adapter: DrizzleAdapter(db, {
     usersTable: users,
     accountsTable: accounts,
     sessionsTable: sessions,
     verificationTokensTable: verificationTokens,
-    authenticatorsTable: authenticators,
   }) as Adapter,
   session: {
     strategy: 'jwt',
@@ -83,12 +142,20 @@ export const authOptions: NextAuthOptions = {
   providers: [
     CredentialsProvider({
       credentials: {
-        email: { label: 'Email', type: 'text' },
-        password: { label: 'Password', type: 'password' },
+        email: {
+          label: 'Email',
+          type: 'email',
+          placeholder: '',
+        },
+        password: {
+          label: 'Password',
+          type: 'password',
+          placeholder: '',
+        },
       },
       authorize: async function (
-        credentials: Record<'email' | 'password', string> | undefined,
-        request: Pick<RequestInternal, 'query' | 'body' | 'headers' | 'method'>
+        credentials: Record<'email' | 'password', string> | undefined
+        //request: Pick<RequestInternal, 'query' | 'body' | 'headers' | 'method'>
       ): Promise<User | null> {
         if (!credentials?.email || !credentials?.password) {
           throw new Error('Missing credentials!')
@@ -103,29 +170,33 @@ export const authOptions: NextAuthOptions = {
         }
 
         if (!user) {
-          return null
+          throw new Error('Invalid credentials!')
         }
 
-        const isAuthenticated = await bcrypt.compare(
+        const passwordMatch = await bcrypt.compare(
           credentials.password,
-          user.password ?? ''
+          user.password!
         )
 
-        return isAuthenticated ? user : null
+        if (passwordMatch) {
+          return user
+        }
+
+        return null
       },
     }),
     DiscordProvider({
-      clientId: env.DISCORD_CLIENT_ID,
-      clientSecret: env.DISCORD_CLIENT_SECRET,
+      clientId: env.AUTH_DISCORD_ID,
+      clientSecret: env.AUTH_DISCORD_SECRET,
     }),
     GitHubProvider({
-      clientId: env.GITHUB_CLIENT_ID,
-      clientSecret: env.GITHUB_CLIENT_SECRET,
+      clientId: env.AUTH_GITHUB_ID,
+      clientSecret: env.AUTH_GITHUB_SECRET,
     }),
     BattleNetProvider({
-      clientId: env.BATTLENET_CLIENT_ID,
-      clientSecret: env.BATTLENET_CLIENT_SECRET,
-      issuer: env.BATTLENET_ISSUER,
+      clientId: env.AUTH_BATTLENET_ID,
+      clientSecret: env.AUTH_BATTLENET_SECRET,
+      issuer: env.AUTH_BATTLENET_ISSUER,
       authorization: {
         params: {
           scope: 'openid wow.profile',

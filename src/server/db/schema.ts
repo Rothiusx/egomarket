@@ -1,7 +1,6 @@
 import { relations, sql } from 'drizzle-orm'
 import {
   bigint,
-  boolean,
   index,
   int,
   json,
@@ -82,6 +81,7 @@ export const historyRelations = relations(history, ({ one }) => ({
  */
 export const users = createTable('user', {
   id: varchar('id', { length: 255 })
+    .notNull()
     .primaryKey()
     .$defaultFn(() => crypto.randomUUID()),
   name: varchar('name', { length: 255 }),
@@ -91,6 +91,10 @@ export const users = createTable('user', {
     fsp: 3,
   }),
   password: varchar('password', { length: 255 }),
+  roles: varchar('roles', { length: 255 })
+    .notNull()
+    .default('USER')
+    .$type<UserRole>(),
   image: varchar('image', { length: 255 }),
 })
 
@@ -140,31 +144,6 @@ export const verificationTokens = createTable(
   (verificationToken) => ({
     compositePk: primaryKey({
       columns: [verificationToken.identifier, verificationToken.token],
-    }),
-  })
-)
-
-export const authenticators = createTable(
-  'authenticator',
-  {
-    credentialID: varchar('credentialID', { length: 255 }).notNull().unique(),
-    userId: varchar('userId', { length: 255 })
-      .notNull()
-      .references(() => users.id, { onDelete: 'cascade' }),
-    providerAccountId: varchar('providerAccountId', { length: 255 }).notNull(),
-    credentialPublicKey: varchar('credentialPublicKey', {
-      length: 255,
-    }).notNull(),
-    counter: int('counter').notNull(),
-    credentialDeviceType: varchar('credentialDeviceType', {
-      length: 255,
-    }).notNull(),
-    credentialBackedUp: boolean('credentialBackedUp').notNull(),
-    transports: varchar('transports', { length: 255 }),
-  },
-  (authenticator) => ({
-    compositePk: primaryKey({
-      columns: [authenticator.userId, authenticator.credentialID],
     }),
   })
 )

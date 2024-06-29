@@ -11,29 +11,43 @@ import {
 } from '@/components/ui/form'
 import { IconHoverButton } from '@/components/ui/icon-hover-button'
 import { Input } from '@/components/ui/input'
+import {
+  StatusMessage,
+  type StatusMessageProps,
+} from '@/components/ui/status-message'
 import { profileSchema } from '@/schemas/profile'
 import { api } from '@/trpc/react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { LoaderCircle, SaveAll } from 'lucide-react'
 import { type Session } from 'next-auth'
+import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
+import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { type z } from 'zod'
 
-export function EditProfile({ user }: { user: Session['user'] }) {
+export function EditProfile({ session }: { session: Session }) {
   const router = useRouter()
+  const { update } = useSession()
+  const [message, setMessage] = useState<StatusMessageProps>(undefined!)
 
   const editProfile = api.profile.edit.useMutation({
-    onSuccess: () => {
+    onSuccess: async () => {
       const { name, email } = form.getValues()
       form.reset({ name, email })
+      await update()
       router.refresh()
-      toast.success('Profile saved!')
+      toast.success('Changes saved!')
+      setMessage({
+        variant: 'success',
+        message: 'Changes saved!',
+      })
     },
     onError: (error) => {
       toast.error(error.message)
-      form.setError('email', {
+      setMessage({
+        variant: 'error',
         message: error.message,
       })
     },
@@ -42,13 +56,17 @@ export function EditProfile({ user }: { user: Session['user'] }) {
   const form = useForm<z.infer<typeof profileSchema>>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
-      name: user.name ?? '',
-      email: user.email ?? '',
+      name: session.user.name ?? undefined,
+      email: session.user.email ?? undefined,
     },
   })
 
+  useEffect(() => {
+    setMessage(undefined!)
+  }, [form.formState.isDirty])
+
   function onSubmit({ name, email }: z.infer<typeof profileSchema>) {
-    if (name === user.name && email === user.email) {
+    if (name === session.user.name && email === session.user.email) {
       toast.error('No changes detected!')
     } else {
       try {
@@ -95,6 +113,7 @@ export function EditProfile({ user }: { user: Session['user'] }) {
             </FormItem>
           )}
         />
+        <StatusMessage {...message} />
         <IconHoverButton
           className="min-w-32"
           icon={<SaveAll className="size-4" />}

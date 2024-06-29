@@ -2,7 +2,7 @@ import { signUpSchema } from '@/schemas/auth'
 import { createTRPCRouter, publicProcedure } from '@/server/api/trpc'
 import { users } from '@/server/db/schema'
 import { TRPCError } from '@trpc/server'
-import bcrypt from 'bcryptjs'
+import bcrypt from 'bcrypt'
 import { eq } from 'drizzle-orm'
 
 export const authRouter = createTRPCRouter({
@@ -20,8 +20,7 @@ export const authRouter = createTRPCRouter({
         })
       }
 
-      const salt = await bcrypt.genSalt(10)
-      const hashedPassword = await bcrypt.hash(input.password, salt)
+      const hashedPassword = await bcrypt.hash(input.password, 10)
 
       await ctx.db.insert(users).values({
         name: input.email,

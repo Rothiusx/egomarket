@@ -42,8 +42,8 @@ async function refreshAccessToken() {
       formData,
       {
         auth: {
-          username: env.BATTLENET_CLIENT_ID,
-          password: env.BATTLENET_CLIENT_SECRET,
+          username: env.AUTH_BATTLENET_ID,
+          password: env.AUTH_BATTLENET_SECRET,
         },
         headers: {
           'Content-Type': 'multipart/form-data',
