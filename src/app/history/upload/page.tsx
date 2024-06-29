@@ -5,7 +5,7 @@ import { HistoryUploadForm } from './_components/history-upload-form'
 export default async function Gold() {
   const session = await getServerAuthSession()
 
-  if (!session) {
+  if (session?.user.roles !== 'ADMIN') {
     redirect('/history')
   }
 

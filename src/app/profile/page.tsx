@@ -1,4 +1,12 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Badge } from '@/components/ui/badge'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card'
 import { getServerAuthSession } from '@/server/auth'
 import { redirect } from 'next/navigation'
 import { EditProfile } from './_components/edit-profile'
@@ -19,7 +27,19 @@ export default async function Page() {
         </AvatarFallback>
       </Avatar>
       <h1 className="text-4xl font-medium">Welcome, {session.user.name}!</h1>
-      <EditProfile session={session} />
+      <Card>
+        <CardHeader>
+          <CardTitle>Edit Profile</CardTitle>
+          <CardDescription>Update your profile information</CardDescription>
+        </CardHeader>
+        <CardContent className="flex flex-col gap-4">
+          <div className="flex items-center justify-between">
+            <span className="text-sm">Permissions</span>
+            <Badge>{session.user.roles}</Badge>
+          </div>
+          <EditProfile session={session} />
+        </CardContent>
+      </Card>
     </section>
   )
 }

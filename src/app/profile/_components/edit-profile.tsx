@@ -90,7 +90,11 @@ export function EditProfile({ session }: { session: Session }) {
             <FormItem>
               <FormLabel>Name</FormLabel>
               <FormControl>
-                <Input placeholder="John Doe" {...field} />
+                <Input
+                  className="bg-slate-200/50 dark:bg-slate-900/50"
+                  placeholder="John Doe"
+                  {...field}
+                />
               </FormControl>
               <FormDescription>
                 Your name as it will appear on the website
@@ -106,7 +110,12 @@ export function EditProfile({ session }: { session: Session }) {
             <FormItem>
               <FormLabel>Email</FormLabel>
               <FormControl>
-                <Input placeholder="john.doe@example.com" {...field} />
+                <Input
+                  className="bg-slate-200/50 dark:bg-slate-900/50"
+                  placeholder="john.doe@example.com"
+                  disabled={!!session.user.email && session.user.oauth}
+                  {...field}
+                />
               </FormControl>
               <FormDescription>Your email address</FormDescription>
               <FormMessage />
@@ -115,7 +124,7 @@ export function EditProfile({ session }: { session: Session }) {
         />
         <StatusMessage {...message} />
         <IconHoverButton
-          className="min-w-32"
+          className="min-w-32 float-right"
           icon={<SaveAll className="size-4" />}
           type="submit"
           disabled={editProfile.isPending || !form.formState.isDirty}

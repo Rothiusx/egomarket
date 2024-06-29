@@ -34,6 +34,8 @@ declare module 'next-auth' {
     user: {
       id: string
       roles: UserRole
+      oauth: boolean
+      provider?: string
     } & DefaultSession['user']
   }
   // interface User {
@@ -46,6 +48,8 @@ declare module 'next-auth/jwt' {
   interface JWT {
     sub: string
     roles: UserRole
+    oauth: boolean
+    provider?: string
   }
 }
 
@@ -68,51 +72,56 @@ export const authOptions: NextAuthOptions = {
       return true
     },
     jwt: async ({ token, trigger, session }) => {
-      // console.log('🚀 token', { jwt: token })
-      // console.log('🚀 trigger', { jwt: trigger })
-
       if (trigger === 'update') {
         if (!token.sub) {
           return token
         }
+      }
 
-        const existingUser = await db.query.users.findFirst({
-          columns: {
-            email: true,
-            name: true,
-            roles: true,
-          },
-          where: eq(users.id, token.sub),
-        })
+      const existingUser = await db.query.users.findFirst({
+        columns: {
+          email: true,
+          name: true,
+          roles: true,
+        },
+        where: eq(users.id, token.sub),
+      })
 
-        if (!existingUser) {
-          return token
-        }
+      if (!existingUser) {
+        return token
+      }
 
-        token.email = existingUser.email
-        token.name = existingUser.name
-        token.roles = existingUser.roles
+      const existingAccount = await db.query.accounts.findFirst({
+        columns: {
+          type: true,
+          provider: true,
+        },
+        where: eq(accounts.userId, token.sub),
+      })
+
+      token.email = existingUser.email
+      token.name = existingUser.name
+      token.roles = existingUser.roles
+      token.oauth = existingAccount?.type === 'oauth'
+
+      if (existingAccount) {
+        token.provider = existingAccount.provider
       }
 
       return token
     },
     session: ({ session, token }) => {
-      // console.log('🚀 token', { session: token })
-
-      if (session.user && token.sub) {
-        session.user.id = token.sub
+      if (session.user && token.provider) {
+        session.user.provider = token.provider
       }
 
-      if (session.user && token.roles) {
-        session.user.roles = token.roles
-      }
-
-      // return session
       return {
         ...session,
         user: {
           ...session.user,
           id: token.sub,
+          roles: token.roles,
+          oauth: token.oauth,
         },
       }
     },

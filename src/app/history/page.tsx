@@ -11,7 +11,7 @@ export default async function Page() {
 
   return (
     <section className="container flex flex-col items-center justify-center gap-8 px-4 py-8">
-      {session && (
+      {session?.user.roles === 'ADMIN' && (
         <Link
           href="/history/upload"
           className="rounded-lg bg-slate-700 px-4 py-2 hover:bg-slate-700/50 transition-colors"

@@ -19,6 +19,17 @@ export const profileRouter = createTRPCRouter({
         })
       }
 
+      if (
+        input.email != ctx.session.user.email &&
+        !!ctx.session.user.email &&
+        ctx.session.user.oauth
+      ) {
+        throw new TRPCError({
+          code: 'FORBIDDEN',
+          message: 'Cannot edit email of OAuth account!',
+        })
+      }
+
       await ctx.db
         .update(users)
         .set({

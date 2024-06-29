@@ -153,7 +153,7 @@ export const historyRouter = createTRPCRouter({
   getItemInfo: protectedProcedure
     .input(z.object({ itemId: z.number() }))
     .mutation(async ({ input }) => {
-      const accessToken = await BATTLENET.getAccessToken()
+      const accessToken = await BattleNet.getAccessToken()
       const itemMedia = await axios.get(
         `https://eu.api.blizzard.com/data/wow/media/item/${input.itemId}?namespace=static-eu&locale=en_GB`,
         {
