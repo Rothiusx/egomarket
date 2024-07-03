@@ -156,9 +156,9 @@ export const authOptions: NextAuthOptions = {
         email: {},
         password: {},
       },
-      authorize: async function (
+      authorize: async (
         credentials: Record<'email' | 'password', string> | undefined
-      ): Promise<User | null> {
+      ): Promise<User | null> => {
         if (!credentials?.email || !credentials?.password) {
           throw new Error('Missing credentials!')
         }
@@ -204,7 +204,7 @@ export const authOptions: NextAuthOptions = {
           scope: 'openid wow.profile',
         },
       },
-      profile(profile: { sub: string; battle_tag: string }) {
+      profile: (profile: { sub: string; battle_tag: string }) => {
         return {
           id: profile.sub,
           name: profile.battle_tag,
