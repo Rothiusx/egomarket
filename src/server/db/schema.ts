@@ -2,8 +2,10 @@ import { relations, sql } from 'drizzle-orm'
 import {
   bigint,
   index,
+  integer,
   json,
   pgTable,
+  pgTableCreator,
   primaryKey,
   serial,
   text,
@@ -18,7 +20,9 @@ import { type AdapterAccount } from 'next-auth/adapters'
  *
  * @see https://orm.drizzle.team/docs/goodies#multi-project-schema
  */
-export const posts = pgTable(
+export const createTable = pgTableCreator((name) => `egomarket_${name}`)
+
+export const posts = createTable(
   'post',
   {
     id: serial('id').primaryKey(),
@@ -41,7 +45,7 @@ export const postsRelations = relations(posts, ({ one }) => ({
   user: one(users, { fields: [posts.createdById], references: [users.id] }),
 }))
 
-export const history = pgTable(
+export const history = createTable(
   'history',
   {
     id: serial('id').primaryKey(),
@@ -50,7 +54,7 @@ export const history = pgTable(
       .notNull()
       .references(() => users.id, { onDelete: 'cascade' }),
     report: text('report'),
-    totalPot: bigint('total_pot', { mode: 'number' }).notNull(),
+    totalPot: integer('total_pot').notNull(),
     auctions: json('auctions').notNull(),
     createdBy: json('created_by').notNull(),
     goldLedger: json('gold_ledger').notNull(),
@@ -75,7 +79,7 @@ export const historyRelations = relations(history, ({ one }) => ({
   user: one(users, { fields: [history.uploadedById], references: [users.id] }),
 }))
 
-export const items = pgTable('items', {
+export const items = createTable('items', {
   id: bigint('id', { mode: 'number' }).notNull().primaryKey(),
   mediaId: bigint('media_id', { mode: 'number' }).notNull(),
   icon: text('image').notNull(),
@@ -84,7 +88,7 @@ export const items = pgTable('items', {
 /**
  * ! IMPORTANT: The following tables are used by NextAuth.js for authentication!
  */
-export const users = pgTable('user', {
+export const users = createTable('user', {
   id: text('id')
     .notNull()
     .primaryKey()
@@ -100,19 +104,18 @@ export const users = pgTable('user', {
   image: text('image'),
 })
 
-export const accounts = pgTable(
+export const accounts = createTable(
   'account',
   {
     userId: text('userId')
       .notNull()
-      .references(() => users.id, { onDelete: 'cascade' })
-      .$type<AdapterAccount['type']>()
-      .notNull(),
+      .references(() => users.id, { onDelete: 'cascade' }),
+    type: text('type').$type<AdapterAccount['type']>().notNull(),
     provider: text('provider').notNull(),
     providerAccountId: text('providerAccountId').notNull(),
     refresh_token: text('refresh_token'),
     access_token: text('access_token'),
-    expires_at: serial('expires_at'),
+    expires_at: integer('expires_at'),
     token_type: text('token_type'),
     scope: text('scope'),
     id_token: text('id_token'),
@@ -125,7 +128,7 @@ export const accounts = pgTable(
   })
 )
 
-export const sessions = pgTable('session', {
+export const sessions = createTable('session', {
   sessionToken: text('sessionToken').primaryKey(),
   userId: text('userId')
     .notNull()
@@ -133,7 +136,7 @@ export const sessions = pgTable('session', {
   expires: timestamp('expires', { mode: 'date' }).notNull(),
 })
 
-export const verificationTokens = pgTable(
+export const verificationTokens = createTable(
   'verification_token',
   {
     identifier: text('identifier').notNull(),
