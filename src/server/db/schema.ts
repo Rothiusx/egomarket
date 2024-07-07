@@ -4,13 +4,13 @@ import {
   index,
   integer,
   json,
-  pgTable,
   pgTableCreator,
   primaryKey,
   serial,
   text,
   timestamp,
   uniqueIndex,
+  varchar,
 } from 'drizzle-orm/pg-core'
 import { type AdapterAccount } from 'next-auth/adapters'
 
