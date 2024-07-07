@@ -24,7 +24,7 @@ export default async function Page() {
           recentHistory.map((auction) => (
             <div
               key={auction.id}
-              className="flex flex-col gap-4 rounded-2xl bg-gradient-to-b from-slate-900 to-slate-950 px-4 py-8 text-slate-200 shadow-lg dark:from-slate-900/50 dark:to-slate-950/50"
+              className="flex flex-1 flex-col gap-4 rounded-2xl bg-gradient-to-b from-slate-900 to-slate-950 px-4 py-8 text-slate-200 shadow-lg dark:from-slate-900/50 dark:to-slate-950/50"
             >
               <h2 className="text-center text-3xl font-semibold">
                 {auction.title}
@@ -64,7 +64,7 @@ export default async function Page() {
                                 alt="item"
                                 className="rounded-md border border-slate-950"
                               />
-                              <span className="text-purple-600">
+                              <span className="line-clamp-2 flex-1 text-purple-600">
                                 {item.name}
                               </span>
                               <span className="ml-auto text-yellow-400">
