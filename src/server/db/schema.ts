@@ -2,13 +2,14 @@ import { relations, sql } from 'drizzle-orm'
 import {
   bigint,
   index,
-  int,
   json,
-  mysqlTableCreator,
+  pgTable,
   primaryKey,
+  serial,
+  text,
   timestamp,
-  varchar,
-} from 'drizzle-orm/mysql-core'
+  uniqueIndex,
+} from 'drizzle-orm/pg-core'
 import { type AdapterAccount } from 'next-auth/adapters'
 
 /**
@@ -17,20 +18,18 @@ import { type AdapterAccount } from 'next-auth/adapters'
  *
  * @see https://orm.drizzle.team/docs/goodies#multi-project-schema
  */
-export const createTable = mysqlTableCreator((name) => `egomarket_${name}`)
-
-export const posts = createTable(
+export const posts = pgTable(
   'post',
   {
-    id: bigint('id', { mode: 'number' }).primaryKey().autoincrement(),
-    name: varchar('name', { length: 256 }),
-    createdById: varchar('createdById', { length: 255 })
+    id: serial('id').primaryKey(),
+    name: text('name'),
+    createdById: text('createdById')
       .notNull()
       .references(() => users.id, { onDelete: 'cascade' }),
     createdAt: timestamp('created_at')
       .default(sql`CURRENT_TIMESTAMP`)
       .notNull(),
-    updatedAt: timestamp('updatedAt').onUpdateNow(),
+    updatedAt: timestamp('updated_at').defaultNow(),
   },
   (post) => ({
     createdByIdIdx: index('createdById_idx').on(post.createdById),
@@ -42,20 +41,20 @@ export const postsRelations = relations(posts, ({ one }) => ({
   user: one(users, { fields: [posts.createdById], references: [users.id] }),
 }))
 
-export const history = createTable(
+export const history = pgTable(
   'history',
   {
-    id: bigint('id', { mode: 'number' }).primaryKey().autoincrement(),
+    id: serial('id').primaryKey(),
     uploadedAt: timestamp('uploaded_at').default(sql`CURRENT_TIMESTAMP`),
-    uploadedById: varchar('uploaded_by_id', { length: 255 })
+    uploadedById: text('uploaded_by_id')
       .notNull()
       .references(() => users.id, { onDelete: 'cascade' }),
-    report: varchar('report', { length: 255 }),
+    report: text('report'),
     totalPot: bigint('total_pot', { mode: 'number' }).notNull(),
     auctions: json('auctions').notNull(),
     createdBy: json('created_by').notNull(),
     goldLedger: json('gold_ledger').notNull(),
-    sessionId: varchar('session_id', { length: 255 }).notNull(),
+    sessionId: text('session_id').notNull(),
     mailHistory: json('mail_history').notNull(),
     pot: json('pot').notNull(),
     createdAt: timestamp('created_at').notNull(),
@@ -64,8 +63,8 @@ export const history = createTable(
     }).notNull(),
     lockedAt: timestamp('locked_at').notNull(),
     managementCut: bigint('management_cut', { mode: 'number' }).notNull(),
-    title: varchar('title', { length: 255 }).notNull(),
-    type: varchar('type', { length: 255 }).notNull(),
+    title: text('title').notNull(),
+    type: text('type').notNull(),
   },
   (history) => ({
     uploadedByIdIdx: index('uploaded_by_id_idx').on(history.uploadedById),
@@ -76,52 +75,48 @@ export const historyRelations = relations(history, ({ one }) => ({
   user: one(users, { fields: [history.uploadedById], references: [users.id] }),
 }))
 
-export const items = createTable('items', {
+export const items = pgTable('items', {
   id: bigint('id', { mode: 'number' }).notNull().primaryKey(),
   mediaId: bigint('media_id', { mode: 'number' }).notNull(),
-  icon: varchar('image', { length: 255 }).notNull(),
+  icon: text('image').notNull(),
 })
 
 /**
  * ! IMPORTANT: The following tables are used by NextAuth.js for authentication!
  */
-export const users = createTable('user', {
-  id: varchar('id', { length: 255 })
+export const users = pgTable('user', {
+  id: text('id')
     .notNull()
     .primaryKey()
     .$defaultFn(() => crypto.randomUUID()),
-  name: varchar('name', { length: 255 }),
-  email: varchar('email', { length: 255 }).notNull(),
+  name: text('name'),
+  email: text('email').notNull(),
   emailVerified: timestamp('emailVerified', {
     mode: 'date',
-    fsp: 3,
+    precision: 3,
   }),
-  password: varchar('password', { length: 255 }),
-  roles: varchar('roles', { length: 255 })
-    .notNull()
-    .default('USER')
-    .$type<UserRole>(),
-  image: varchar('image', { length: 255 }),
+  password: text('password'),
+  roles: text('roles').notNull().default('USER').$type<UserRole>(),
+  image: text('image'),
 })
 
-export const accounts = createTable(
+export const accounts = pgTable(
   'account',
   {
-    userId: varchar('userId', { length: 255 })
+    userId: text('userId')
       .notNull()
-      .references(() => users.id, { onDelete: 'cascade' }),
-    type: varchar('type', { length: 255 })
+      .references(() => users.id, { onDelete: 'cascade' })
       .$type<AdapterAccount['type']>()
       .notNull(),
-    provider: varchar('provider', { length: 255 }).notNull(),
-    providerAccountId: varchar('providerAccountId', { length: 255 }).notNull(),
-    refresh_token: varchar('refresh_token', { length: 255 }),
-    access_token: varchar('access_token', { length: 255 }),
-    expires_at: int('expires_at'),
-    token_type: varchar('token_type', { length: 255 }),
-    scope: varchar('scope', { length: 255 }),
-    id_token: varchar('id_token', { length: 2048 }),
-    session_state: varchar('session_state', { length: 255 }),
+    provider: text('provider').notNull(),
+    providerAccountId: text('providerAccountId').notNull(),
+    refresh_token: text('refresh_token'),
+    access_token: text('access_token'),
+    expires_at: serial('expires_at'),
+    token_type: text('token_type'),
+    scope: text('scope'),
+    id_token: text('id_token'),
+    session_state: text('session_state'),
   },
   (account) => ({
     compoundKey: primaryKey({
@@ -130,21 +125,21 @@ export const accounts = createTable(
   })
 )
 
-export const sessions = createTable('session', {
-  sessionToken: varchar('sessionToken', { length: 255 }).primaryKey(),
-  userId: varchar('userId', { length: 255 })
+export const sessions = pgTable('session', {
+  sessionToken: text('sessionToken').primaryKey(),
+  userId: text('userId')
     .notNull()
     .references(() => users.id, { onDelete: 'cascade' }),
   expires: timestamp('expires', { mode: 'date' }).notNull(),
 })
 
-export const verificationTokens = createTable(
+export const verificationTokens = pgTable(
   'verification_token',
   {
-    identifier: varchar('identifier', { length: 255 }).notNull(),
-    token: varchar('token', { length: 255 }).notNull(),
-    iv: varchar('iv', { length: 255 }).notNull(),
-    type: varchar('type', { length: 255 }),
+    identifier: text('identifier').notNull(),
+    token: text('token').notNull(),
+    iv: text('iv').notNull(),
+    type: text('type'),
     expires: timestamp('expires', { mode: 'date' }).notNull(),
   },
   (verificationToken) => ({
