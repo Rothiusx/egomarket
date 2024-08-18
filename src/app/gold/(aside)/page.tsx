@@ -8,5 +8,5 @@ export default async function Gold() {
     redirect('/')
   }
 
-  return <section className="flex flex-col items-center">/gold</section>
+  return <div>home</div>
 }
